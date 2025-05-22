@@ -7,6 +7,7 @@ use std::any::{Any, TypeId};
 use std::cmp::Ordering;
 use std::fmt::{self, Debug, Formatter};
 use std::hash::{Hash, Hasher};
+use std::str::FromStr;
 use std::sync::Arc;
 use typst_macros::cast;
 use typst_syntax::{ast, Span};
@@ -736,6 +737,12 @@ cast! {
         )
         .unwrap(),
     ),
+}
+
+use bigdecimal::BigDecimal;
+cast! {
+    BigDecimal,
+    self => Value::Decimal(Decimal::from_str(self.to_plain_string().as_str()).unwrap()),
 }
 
 #[cfg(test)]
