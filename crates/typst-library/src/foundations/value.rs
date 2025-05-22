@@ -1,13 +1,14 @@
+use chrono::{Datelike, Timelike};
+use ecow::{eco_format, EcoString};
+use serde::de::value::{MapAccessDeserializer, SeqAccessDeserializer};
+use serde::de::{Error, MapAccess, SeqAccess, Visitor};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::any::{Any, TypeId};
 use std::cmp::Ordering;
 use std::fmt::{self, Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
-
-use ecow::{eco_format, EcoString};
-use serde::de::value::{MapAccessDeserializer, SeqAccessDeserializer};
-use serde::de::{Error, MapAccess, SeqAccess, Visitor};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use typst_macros::cast;
 use typst_syntax::{ast, Span};
 use typst_utils::ArcExt;
 
@@ -702,6 +703,39 @@ impl<T: Clone + Fold> Fold for Arc<T> {
     fn fold(self, outer: Self) -> Self {
         Arc::new(Arc::take(self).fold(Arc::take(outer)))
     }
+}
+
+// impl IntoValue for chrono::NaiveDateTime {
+//     fn into_value(self) -> Value {
+//         Value::Datetime(
+//             Datetime::from_ymd_hms(
+//                 self.year(),
+//                 self.month() as u8,
+//                 self.day() as u8,
+//                 self.hour() as u8,
+//                 self.minute() as u8,
+//                 self.second() as u8,
+//             )
+//             .unwrap(),
+//         )
+//     }
+// }
+
+use chrono::NaiveDateTime;
+
+cast! {
+    NaiveDateTime,
+    self => Value::Datetime(
+        Datetime::from_ymd_hms(
+            self.year(),
+            self.month() as u8,
+            self.day() as u8,
+            self.hour() as u8,
+            self.minute() as u8,
+            self.second() as u8,
+        )
+        .unwrap(),
+    ),
 }
 
 #[cfg(test)]
